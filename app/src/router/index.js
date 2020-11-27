@@ -1,16 +1,17 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
-
+import NProgress  from 'nprogress';
+import 'nprogress/nprogress.css' 
 Vue.use(VueRouter);
-const originalPush = VueRouter.prototype.push
+const originalPush = VueRouter.prototype.push;
 VueRouter.prototype.push = function push(location) {
-   return originalPush.call(this, location).catch(err => err)
-}
+  return originalPush.call(this, location).catch((err) => err);
+};
 const routes = [
   {
     path: "/",
     component: () => import("@/views/layout"),
-    redirect:'/home',
+    redirect: "/home",
     children: [
       {
         path: "about",
@@ -33,21 +34,34 @@ const routes = [
         meta: { title: "首页" },
       },
       {
-        path:'article/:id',
-        component:() => import('@/views/article'),
-        meta:{title:'文章详情'}
-      }
+        path: "article/:id",
+        component: () => import("@/views/article"),
+        meta: { title: "文章详情" },
+      },
+      {
+        path: "classify/:type",
+        component: () => import("@/views/classify"),
+        meta: { title: "文章分类" },
+      },
     ],
   },
 ];
-
+NProgress .configure({ showSpinner: false }) 
 const router = new VueRouter({
-  mode: "history",
+  scrollBehavior(to, from, savedPosition) {
+    return { x: 0, y: 0 };
+  },
+  mode: "hash",
   base: process.env.BASE_URL,
   routes,
 });
 
+router.beforeEach((to,from,next)=>{
+  NProgress .start();
+  next()
+})
 router.afterEach((to, from) => {
   document.title = to.meta.title;
+  NProgress.done()
 });
 export default router;

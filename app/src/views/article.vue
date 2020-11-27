@@ -2,20 +2,20 @@
   <div class="article_container">
     <el-card>
       <div class="date">
-        <p>9月</p>
-        <span>25</span>
+        <p>{{new Date(pageData.create_time).getMonth()+1}}月</p>
+        <span>{{String(new Date(pageData.create_time).getDate()).padStart(2,'0')}}</span>
       </div>
-      <h2>这是一个标题</h2>
+      <h2>{{pageData.title}}</h2>
       <p class="subtitle">
         <i class="fa fa-user"> 发表于</i>
-        <i class="fa fa-clock"> 2018年09月25日 • </i>
-        <i class="fa fa-eye"> 3424 次围观 • </i>
-        <i class="fa fa-comments"> 活捉 228 条 </i>
+        <i class="fa fa-clock"> {{pageData.create_time|formatDate}} • </i>
+        <i class="fa fa-eye"> {{pageData.views}} 次围观 • </i>
+        <i class="fa fa-comments"> 活捉 {{pageData.comment_num}} 条 </i>
         <!-- <i class="fa fa-heart"> 22点赞 • </i>
         <i class="fa fa-star"> 18收藏</i> -->
       </p>
-      <div class="type_card">生活杂谈</div>
-      <section></section>
+      <div class="type_card" @click="$router.push('/classify/'+pageData.type)">{{type[pageData.type]}}</div>
+      <section v-html="pageData.content"></section>
       <div class="btn_wrap">
         <el-button type="danger" @click="showCode = !showCode">赞赏</el-button>
       </div>
@@ -30,21 +30,50 @@
         </div>
       </div>
     </el-card>
-    <comment />
+    <comment :id="$route.params.id" />
   </div>
 </template>
 
 <script>
-import comment from "@/components/comment"
+import comment from "@/components/comment";
+import { getArticleDetail } from "@/api";
+import { dateFormat } from "@/utils/utils"
 export default {
   data() {
     return {
-      showCode:false
+      showCode: false,
+      pageData: {},
+      type: {
+        1: '技术分享',
+        2: '生活杂谈'
+      }
     }
   },
-  components:{
+  watch: {
+    '$route.params.id': {
+      handler() {
+        this.getDetail()
+      },
+      immediate: true
+    }
+  },
+  methods: {
+    async getDetail() {
+      let id = this.$route.params.id;
+      let res = await getArticleDetail(id);
+      if (res.success) {
+        this.pageData = res.data
+      }
+    }
+  },
+  components: {
     comment
-  }
+  },
+  filters: {
+    formatDate(value) {
+      return dateFormat(value, 'yyyy-MM-dd hh:mm')
+    }
+  },
 }
 </script>
 
@@ -84,6 +113,7 @@ export default {
     display: inline-block;
     font-size: 14px;
     position: absolute;
+    cursor: pointer;
     left: 0;
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
       0 3px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 5px 0 rgba(0, 0, 0, 0.12);
@@ -119,6 +149,13 @@ export default {
     font-weight: bold;
   }
 }
+section{
+  margin-bottom: 20px;
+  & /deep/ *{
+    line-height: 1.4em;
+    max-width: 100%;
+  }
+}
 .qrcode {
   display: flex;
   justify-content: center;
@@ -132,5 +169,20 @@ export default {
       font-size: 14px;
     }
   }
+}
+@media screen and (max-width:768px){
+    .date{
+      width: 50px;
+      height:50px;
+      padding: 0;
+      left: -4px;
+      font-size: 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      span{
+        font-size: 18px;
+      }
+    }
 }
 </style>

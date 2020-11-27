@@ -2,7 +2,7 @@
   <div>
     <el-card>
       <h2>发表评论</h2>
-      <el-input type="textarea" class="textarea" :rows="5"  v-model="textarea"></el-input>
+      <el-input type="textarea" class="textarea" :rows="5"  v-model.trim="textarea"></el-input>
       <div :class="pBody?'OwO':'OwO OwO-open'">
         <div class="OwO-logo" @click="pBody=!pBody">
           <span>OwO表情</span>
@@ -20,9 +20,9 @@
           </div>
         </div>
       </div>
-      <div class="send">发送~</div>
+      <div class="send" @click="addArticleComment">发送~</div>
       <div class="tmsg-comments"  ref="listDom">
-            <a  class="tmsg-comments-tip">活捉 10 条</a>
+            <a  class="tmsg-comments-tip">活捉 {{commentList.length}} 条</a>
             <div class="tmsg-commentshow">
                 <ul class="tmsg-commentlist">
                     <li class="tmsg-c-item" v-for="(item,index) in commentList" :key="'common'+index">
@@ -30,22 +30,21 @@
                             <header>
                                 <img  src="@/assets/image/tou.jpg"  >
                                 <div class="i-name">
-                                    {{item.username}}
+                                    游客
                                 </div>
                                 <div class="i-time">
-                                    <time>{{item.time}}</time>
+                                    <time>{{item.create_time|formatDate}}</time>
                                 </div>
                             </header>
                             <section>
-                                <!-- <p v-html="analyzeEmoji(item.content)">{{analyzeEmoji(item.content)}}</p> -->
-                                <span>xxxxx</span>
+                                <p v-html="analyzeEmoji(item.content)">{{analyzeEmoji(item.content)}}</p>                                
                             </section>
                         </article>
                     </li>
 
                 </ul>
-                <h1 v-show='hasMore' class="send" @click="addMoreFun" >查看更多</h1>
-                <h1 v-show='!hasMore' class="send" style="cursor:auto">没有更多</h1>
+                <h1 v-show='hasNextPage' class="send" @click="addMoreFun" >查看更多</h1>
+                <h1 v-show='!hasNextPage' class="send" style="cursor:auto">没有更多</h1>
             </div>
         </div>
     </el-card>
@@ -53,7 +52,10 @@
 </template>
 
 <script>
+import {addComment,getComment} from "@/api";
+import { dateFormat } from "@/utils/utils"
 export default {
+  props:['id'],
   data() {
     return {
       OwOlist: [//表情包和表情路径
@@ -132,10 +134,20 @@ export default {
       ],
       pBody: true,
       textarea: '',
-      commentList:[
-        {username:'游客',time:'2020-11-18 20:53:07'}
-      ],
-      hasMore:false
+      commentList:[],
+      hasNextPage:false,
+      form:{
+        pageSize:10,
+        pageNum:1
+      }
+    }
+  },
+  watch:{
+    id:{
+      handler(){
+        this.getComments()
+      },
+      immediate:true
     }
   },
   methods: {
@@ -156,14 +168,42 @@ export default {
               break;
             }
           }
-          str = str.replace(pattern2, '<img src="@/assets/image/emoji/' + src + '"/>');
+          str = str.replace(pattern2, `<img src="${require('@/assets/image/emoji/'+src)} "/>`);
         }
-        // console.log(str);
       }
       return str;
     },
-    addMoreFun(){}
+    async addArticleComment(){
+      if(!this.textarea){
+        this.$message.error('请输入内容哦~');
+        return 
+      }
+      let res = await addComment({article_id:this.id,content:this.textarea});
+      if(res.success){
+        this.commentList.unshift(res.data)
+        this.textarea = ''
+      }
+    },
+    async getComments(){
+      let res = await getComment({...this.form,article_id:this.id});
+      if(res.success){
+        this.commentList = this.form.pageNum==1?res.body.list:this.commentList.concat(res.body.list);        
+        this.hasNextPage = res.body.hasNextPage
+      }
+    },
+    addMoreFun(){
+      if(this.hasNextPage){
+        this.form.pageNum++;
+        this.getComments()
+      }
+    }
   },
+  filters:{
+    formatDate(value) {
+      return dateFormat(value)
+    }
+  },
+  created(){}
 }
 </script>
 
@@ -732,7 +772,7 @@ export default {
 .tmsg-c-item article section{
     margin-left: 80px;
 }
-.tmsg-c-item article section p img{
+.tmsg-c-item article section /deep/ p img{
     vertical-align: middle;
 }
 .tmsg-c-item article section .tmsg-replay{

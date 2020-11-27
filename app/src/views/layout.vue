@@ -11,12 +11,14 @@
               </el-col>
           </el-row>
       </div>
+      <my-footer></my-footer>
   </div>
 </template>
 
 <script>
 import navHeader from "@/components/navHeader";
-import rightSlider from "@/components/rightSlider"
+import rightSlider from "@/components/rightSlider";
+import myFooter from "@/components/myFooter"
 export default {
   data() {
     return {
@@ -25,7 +27,8 @@ export default {
   },
   components:{
       navHeader,
-      rightSlider
+      rightSlider,
+      myFooter
   }
 }
 </script>
@@ -38,5 +41,11 @@ export default {
     width: 80%;
     margin: 0 auto;
     margin-top: 80px;
+}
+@media screen and (max-width:768px){
+     .container{
+         width: 90%;
+         margin-top: 20px;
+     }
 }
 </style>

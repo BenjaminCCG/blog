@@ -11,7 +11,7 @@
                     <i :class="item.icon"></i>
                     <span>{{item.name}}</span>
                   </template>
-                  <el-menu-item class="subitem" :index="idx+'-'+i" v-for="(it,i) in item.children" :key="i" @click="$router.push(it.to+'/'+it.classId)">{{it.name}}</el-menu-item>
+                  <el-menu-item class="subitem" :index="idx+'-'+i" v-for="(it,i) in item.children" :key="i" @click="$router.push(it.to+'/'+it.type)">{{it.name}}</el-menu-item>
                 </el-submenu>
                 <el-menu-item :index="String(idx)" :key="idx" v-else @click="$router.push(item.to)">
                   <i :class="item.icon"></i>
@@ -20,28 +20,21 @@
               </template>
             </el-menu>
             <div>
-              <weather />
+              <weather class="weather" />
             </div>
           </div>
-          <!-- <div class="mobile_box">
+          <div class="mobile_box">
             <i class="el-icon-menu" style="color:#fff;font-size:18px" @click="isOpen=!isOpen"></i>
             <weather />
-            <el-menu class="mobile_menu" text-color="#fff" v-show="!isOpen" theme="dark"  :unique-opened="true">
+            <el-menu class="mobile_menu"  @select="isOpen=!isOpen" text-color="#fff" v-show="!isOpen" theme="dark"  :unique-opened="true">
               <template v-for="(item,idx) in menuList">
-                <el-submenu :index="String(idx)" :key="idx" v-if="item.children">
-                  <template slot="title">
-                    <i :class="item.icon"></i>
-                    <span>{{item.name}}</span>
-                  </template>
-                  <el-menu-item class="subitem" :index="idx+'-'+i" v-for="(it,i) in item.children" :key="i" @click="$router.push(it.to+'/'+it.classId)">{{it.name}}</el-menu-item>
-                </el-submenu>
-                <el-menu-item :index="String(idx)" :key="idx" v-else @click="$router.push(item.to)">
+                <el-menu-item :index="String(idx)" :key="idx" v-if="!item.children" @click="$router.push(item.to)">
                   <i :class="item.icon"></i>
                   <span>{{item.name}}</span>
                 </el-menu-item>
               </template>
             </el-menu>
-          </div> -->
+          </div>
         </el-col>
       </el-row>
       <div class="benjamin" id="ityped"></div>
@@ -72,13 +65,13 @@ export default {
           children: [
             {
               name: '技术分享',
-              to: '/article',
-              classId: 1
+              to: '/classify',
+              type: 1
             },
             {
               name: '生活杂谈',
-              to: '/article',
-              classId: 2
+              to: '/classify',
+              type: 2
             }
           ]
         },
@@ -119,8 +112,8 @@ export default {
 
 <style lang="scss" scoped>
 @font-face {
-  font-family: "my_font";
-  src: url("../assets/font/my_font.ttf");
+  font-family: benjamin;
+  src: url("http://ccodecloud.xyz/static/my_font.ttf");
 }
 .header_bg {
   background: url("../assets/image/headbg.jpg") 20% center no-repeat;
@@ -182,7 +175,7 @@ export default {
     left: 50%;
     top: 200px;
     transform: translateX(-50%);
-    font-family: "my_font";
+    font-family: benjamin;
     font-weight: bold;
     font-size: 100px;
     text-align: center;
@@ -246,26 +239,36 @@ export default {
     // }
   }
 }
-// @media screen and (max-width: 768px) {
-//   .pc_box {
-//     display: none;
-//   }
-//   .mobile_box {
-//     display: flex;
-//     align-items: center;
-//     justify-content: space-between;
-//     padding: 6px 0;
-//   }
-//   .header_bg {
-//     background-position: 40% 70%;
-//     height: 400px;
-//     .benjamin {
-//       top: 50px;
-//       font-size: 60px;
-//     }
-//     .myself {
-//       display: none;
-//     }
-//   }
-// }
+@media screen and (max-width: 768px) {
+  .header_bg {
+    height: 300px;
+    .pc_box {
+      display: none;
+    }
+    .myself {
+      display: none;
+    }
+  }
+
+  .mobile_box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 0;
+     .mobile_menu{
+       background: rgba(40, 42, 44, 0.6);
+     }
+  }
+  .header_bg {
+    background-position: 40% 70%;
+    height: 300px;
+    .benjamin {
+      top: 100px;
+      font-size: 60px;
+    }
+    .myself {
+      display: none;
+    }
+  }
+}
 </style>

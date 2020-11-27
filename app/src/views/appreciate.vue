@@ -20,7 +20,7 @@
         </div>
       </div>
     </el-card>
-    <comment />
+    <comment id="1" />
   </div>
 </template>
 

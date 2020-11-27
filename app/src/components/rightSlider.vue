@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="right_slider">
     <el-card>
       <img src="@/assets/image/headright.jpg" alt="" class="junming">
       <div class="tool_container">
@@ -7,9 +7,7 @@
           <i class="fa fa-github" @click="toUrl('https://github.com/BenjaminCCG')"></i>
         </el-tooltip>
         <el-tooltip class="item" effect="dark" content="QQ" placement="top">
-          
-            <a href="http://ccodecloud.xyz/static/qq.jpg" target="_blank"><i class="fa fa-qq"></i></a>
-          
+          <a href="http://ccodecloud.xyz/static/qq.jpg" target="_blank"><i class="fa fa-qq"></i></a>
         </el-tooltip>
         <el-tooltip class="item" effect="dark" content="微博" placement="top">
           <i class="fa fa-weibo" @click="toUrl('https://weibo.com/5903523496/profile?rightmod=1&wvr=6&mod=personinfo&is_all=1')"></i>
@@ -28,10 +26,10 @@
     </el-card>
     <el-card>
       <ul class="title_list">
-        <li v-for="i in 6" :key="i">
-          <span>这是一个标题</span>
+        <li v-for="item in list" :key="item.id">
+          <span @click="$router.push('/article/'+item.id)">{{item.title}}</span>
           ——
-          <span> 3430 次围观</span>
+          <span> {{item.views}} 次围观</span>
         </li>
       </ul>
     </el-card>
@@ -42,16 +40,20 @@
 </template>
 
 <script>
+import { getArticleList, likeup, likecount } from '@/api'
 export default {
   data() {
     return {
       isLike: false,
       likeNum: 0,
       gotoTop: false,
-      going: false
+      going: false,
+      list: [],
     }
   },
   mounted() {
+    this.getArtList();
+    this.getLikeCount()
     let that = this;
     window.onscroll = function () {
       var t = document.documentElement.scrollTop || document.body.scrollTop;
@@ -62,15 +64,15 @@ export default {
           that.gotoTop = false;
         }
       }
-
     }
-
-
   },
   methods: {
-    handleLike() {
+    async handleLike() {
       if (!this.isLike) {
-        this.likeNum++
+        let res = await likeup();
+        if (res.success) {
+          this.likeNum++
+        }
       }
       this.isLike = true;
       let timer = setTimeout(() => {
@@ -95,8 +97,20 @@ export default {
         };
       }, 30);
     },
-    toUrl(url){
-      window.open(url,'_blank')
+    toUrl(url) {
+      window.open(url, '_blank')
+    },
+    async getArtList() {
+      let res = await getArticleList();
+      if (res.success) {
+        this.list = res.body.list;
+      }
+    },
+    async getLikeCount() {
+      let res = await likecount();
+      if (res.success) {
+        this.likeNum = res.data.likes_num
+      }
     }
   }
 }
@@ -154,6 +168,7 @@ export default {
         transition: background-position 1s steps(28);
         transition-duration: 0s;
         cursor: pointer;
+        margin-left: -20px;
       }
       .active {
         transition-duration: 1s;
@@ -165,7 +180,7 @@ export default {
 .toTop {
   position: fixed;
   right: 40px;
-  top: -150px;
+  top: -350px;
   z-index: 99;
   width: 70px;
   height: 900px;
@@ -175,17 +190,25 @@ export default {
 .goTop {
   top: -950px;
 }
-.title_list{
+.title_list {
   font-size: 14px;
-  li{
+  li {
     margin: 15px 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    &>span:first-child{
-    font-weight: bold;
-    cursor: pointer;
+    & > span:first-child {
+      font-weight: bold;
+      cursor: pointer;
+    }
   }
+}
+@media screen and (max-width:768px){
+  .right_slider{
+    margin-top: 20px;
+  }
+  .toTop{
+    display: none;
   }
 }
 </style>

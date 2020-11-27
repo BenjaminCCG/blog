@@ -7,7 +7,7 @@
 
 <script>
 import BMap from 'BMap';
-import { getWeather } from "@/api/home"
+import { getWeather } from "@/api/index"
 export default {
   data() {
     return {

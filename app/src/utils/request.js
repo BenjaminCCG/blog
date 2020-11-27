@@ -4,7 +4,7 @@ import { MessageBox, Message } from 'element-ui'
 // create an axios instance
 const service = axios.create({
   // withCredentials: true, // send cookies when cross-domain requests
-  timeout: 5000 // request timeout
+  timeout: 10000 // request timeout
 })
 
 // request interceptor
@@ -36,7 +36,7 @@ service.interceptors.response.use(
   response => {
     const res = response.data
     // if the custom code is not 20000, it is judged as an error.
-    if (res.status != 1000) {
+    if (res.status != 1000&&res.code != 200) {
       Message({
         message: res.message || 'Error',
         type: 'error',

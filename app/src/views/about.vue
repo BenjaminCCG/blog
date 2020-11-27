@@ -9,7 +9,7 @@
       </section>
       <img src="@/assets/image/maoto.png" class="timg" alt="">
     </el-card>
-    <comment />
+    <comment id="3" />
   </div>
 </template>
 

@@ -24,16 +24,18 @@
       </el-table-column>
       <el-table-column label="操作">
         <template slot-scope="scope">
-          <el-button type="text" size="small">删除</el-button>
-          <el-button type="text" size="small">编辑</el-button>
+          <el-button type="text" size="small" @click="remove(scope.row.id)">删除</el-button>
+          <el-button type="text" size="small" @click="$router.push({path:'/article/edit',query:scope.row})">编辑</el-button>
         </template>
       </el-table-column>
     </el-table>
+    <el-pagination @current-change="handleCurrentChange" :current-page.sync="page.pageNum" :page-size="page.pageSize" layout="total, prev, pager, next" :total="total">
+    </el-pagination>
   </div>
 </template>
 
 <script>
-import { getList } from "@/api/article";
+import { getList, deleteArticle } from "@/api/article";
 export default {
   name: 'Article',
   data() {
@@ -42,15 +44,39 @@ export default {
       form: {
         title: '',
         date: ''
-      }
+      },
+      page: {
+        pageSize: 10,
+        pageNum: 1
+      },
+      total:0
     }
   },
   methods: {
     async getArtList() {
-      let res = await getList();
-      if(res.success){
-          this.tableData = res.data;
+      let res = await getList(this.page);
+      if (res.success) {
+        this.tableData = res.body.list;
+        this.total = res.body.total
       }
+    },
+    remove(id) {
+      let that = this;
+      this.$confirm('确定要删除该文章吗？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        let res = await deleteArticle({ id });
+        if (res.success) {
+          this.$message.success('删除成功')
+          that.getArtList()
+        }
+      })
+    },
+    handleCurrentChange(value){
+      this.form.pageNum = value;
+      this.getArtList()
     }
   },
   created() {

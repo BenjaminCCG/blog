@@ -9,13 +9,12 @@
       </el-form-item>
       <el-form-item label="分类">
         <el-radio-group v-model="form.type">
-          <el-radio label="0">文章</el-radio>
-          <el-radio label="1">项目</el-radio>
-          <el-radio label="2">关于</el-radio>
+          <el-radio label="1">技术分享</el-radio>
+          <el-radio label="2">生活杂谈</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="封面">
-        <el-upload class="avatar-uploader" action="/api/article/saveavatar" :show-file-list="false" :on-success="handleAvatarSuccess">
+        <el-upload class="avatar-uploader" :action="uploadUrl" :show-file-list="false" :on-success="handleAvatarSuccess">
           <img v-if="form.img" :src="form.img" class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
@@ -32,25 +31,28 @@
 
 <script>
 import tinymce from "@/components/Tinymce/index";
-import { addArticle } from "@/api/article"
+import { addArticle,editArticle } from "@/api/article"
 export default {
   name: 'Edit',
   data() {
     return {
       form: {
         title: '',
-        type: 0,
+        type: '1',
         content: '',
         desc: '',
-        img: ''
+        img:''
       },
+      isEdit:false,
+      isDev:true,
+      uploadUrl:''
     }
   },
   methods: {
     async handleSubmit() {
-      let res = await addArticle(this.form);
+      let res = await (this.isEdit?editArticle(this.form):addArticle(this.form));
       if (res.success) {
-        this.$message.success('添加成功');
+        this.$message.success(this.isEdit?'修改成功':'添加成功');
         this.$router.go(-1)
       }
     },
@@ -58,6 +60,16 @@ export default {
       if (res.code == 200) {
         this.form.img = res.data.file
       }
+    }
+  },
+  created(){
+    this.uploadUrl = process.env.VUE_APP_BASE_API+'/article/saveavatar'
+    this.isEdit = Object.keys(this.$route.query).length>0?true:false;
+    if(this.isEdit){
+      this.form.id = this.$route.query.id;
+      Object.keys(this.form).forEach(key=>{
+        this.form[key] = this.$route.query[key]
+    })
     }
   },
   components: {

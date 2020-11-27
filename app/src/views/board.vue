@@ -5,7 +5,7 @@
       <p>有什么想对我说的就给我留言吧~</p>
       <img src="@/assets/image/timg.jpg" class="timg" alt="">
     </el-card>
-    <comment />
+    <comment id="2" />
   </div>
 </template>
 
