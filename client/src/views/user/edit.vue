@@ -17,7 +17,7 @@
         <el-input v-model="form.introduce"></el-input>
       </el-form-item>
       <el-form-item label="头像">
-        <el-upload class="avatar-uploader" action="/api/article/saveavatar" :show-file-list="false" :on-success="handleAvatarSuccess">
+        <el-upload class="avatar-uploader" :action="uploadUrl" :show-file-list="false" :on-success="handleAvatarSuccess">
           <img v-if="form.head" :src="form.head" class="avatar">
           <i v-else class="el-icon-plus avatar-uploader-icon"></i>
         </el-upload>
@@ -42,7 +42,8 @@ export default {
         phone: '',
         introduce: '',
         head: ''
-      }
+      },
+      uploadUrl:''
     }
   },
   methods: {
@@ -58,6 +59,9 @@ export default {
         this.$router.go(-1)
       }
     },
+  },
+  created(){
+    this.uploadUrl = process.env.VUE_APP_BASE_API+'/article/saveavatar'
   }
 }
 </script>
