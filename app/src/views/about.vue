@@ -18,6 +18,19 @@ import comment from "@/components/comment"
 export default {
   components: {
     comment
+  },
+  methods:{
+    socket(){
+      let ws = new WebSocket('ws://localhost:7001')
+      ws.onopen = function(evt) { 
+  console.log("Connection open ..."); 
+  ws.send("Hello WebSockets!");
+};
+
+    }
+  },
+  created(){
+    this.socket()
   }
 }
 </script>

@@ -56,6 +56,15 @@ config.cors = {
   allowMethods: 'GET,HEAD,PUT,POST,DELETE,PATCH,OPTIONS'
 };
 config.uploadDir = 'app/public/avatar/upload';
+config.io={
+  init:{},
+  namespace:{
+    '/':{
+      connectionMiddleware: [],
+      packetMiddleware: [],
+    }
+  }
+}
   return {
     ...config,
     ...userConfig,
